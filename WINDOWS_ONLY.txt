@@ -1,0 +1,37 @@
+=====================================
+FEEDBACK SUPPRESSOR VST3 - WINDOWS ONLY
+=====================================
+
+Este proyecto está configurado EXCLUSIVAMENTE para Windows x64.
+
+PLATAFORMA SOPORTADA:
+  ✓ Windows 10/11 x64 (64 bits)
+  ✗ Windows x86 (32 bits) - NO soportado
+  ✗ macOS - NO soportado  
+  ✗ Linux - NO soportado
+
+COMPILADOR:
+  ✓ Visual Studio 2019 o más nuevo (MSVC)
+  ✓ GitHub Actions (automático)
+
+FORMATO PLUGIN:
+  ✓ VST3 (Windows)
+  ✗ VST2 - NO
+  ✗ AAX - NO
+  ✗ AU (macOS) - NO
+  ✗ AU (Linux VST) - NO
+
+INSTALACIÓN:
+  C:\Program Files\Common Files\VST3\FeedbackSuppressor.vst3
+
+TIEMPO DE COMPILACIÓN (GitHub Actions):
+  ~8-10 minutos (Windows x64 solamente)
+
+Si necesitas compilar para otras plataformas:
+  1. Descarga JUCE de https://juce.com
+  2. Cambia CMakeLists.txt para agregar macOS (AU) o Linux (VST3)
+  3. Modifica .github/workflows/build.yml para agregar jobs
+
+Para este proyecto: solo Windows. ✓
+
+Octubre 2026
