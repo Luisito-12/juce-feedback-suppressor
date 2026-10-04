@@ -1,35 +1,49 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-FeedbackSuppressorAudioProcessor::FeedbackSuppressorAudioProcessor()
+juce::AudioProcessorValueTreeState::ParameterLayout FeedbackSuppressorAudioProcessor::createParameterLayout()
 {
-    // Parámetros
-    addParameter(enabledParam = new juce::AudioParameterBool(
-        "enabled", "Enabled", true));
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
     
-    addParameter(thresholdParam = new juce::AudioParameterFloat(
-        "threshold", "Threshold", 
-        juce::NormalisableRange<float>(-60.0f, 0.0f, 0.1f), 
+    params.push_back(std::make_unique<juce::AudioParameterBool>(
+        juce::ParameterID("enabled", 1), "Enabled", true));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID("threshold", 1), "Threshold",
+        juce::NormalisableRange<float>(-60.0f, 0.0f, 0.1f),
         -20.0f));
     
-    addParameter(ratioParam = new juce::AudioParameterFloat(
-        "ratio", "Ratio",
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID("ratio", 1), "Ratio",
         juce::NormalisableRange<float>(1.0f, 10.0f, 0.1f),
         4.0f));
     
-    addParameter(qFactorParam = new juce::AudioParameterFloat(
-        "qFactor", "Q Factor",
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID("qFactor", 1), "Q Factor",
         juce::NormalisableRange<float>(0.5f, 10.0f, 0.1f),
         1.0f));
     
-    addParameter(numNotchesParam = new juce::AudioParameterInt(
-        "numNotches", "Num Notches",
+    params.push_back(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID("numNotches", 1), "Num Notches",
         1, 12, 4));
     
-    addParameter(outputGainParam = new juce::AudioParameterFloat(
-        "outputGain", "Output Gain",
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID("outputGain", 1), "Output Gain",
         juce::NormalisableRange<float>(-12.0f, 12.0f, 0.1f),
         0.0f));
+    
+    return { params.begin(), params.end() };
+}
+
+FeedbackSuppressorAudioProcessor::FeedbackSuppressorAudioProcessor()
+    : apvts(*this, nullptr, "Parameters", createParameterLayout())
+{
+    enabledParam = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter("enabled"));
+    thresholdParam = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter("threshold"));
+    ratioParam = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter("ratio"));
+    qFactorParam = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter("qFactor"));
+    numNotchesParam = dynamic_cast<juce::AudioParameterInt*>(apvts.getParameter("numNotches"));
+    outputGainParam = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter("outputGain"));
 }
 
 FeedbackSuppressorAudioProcessor::~FeedbackSuppressorAudioProcessor()
@@ -55,14 +69,14 @@ void FeedbackSuppressorAudioProcessor::processBlock(juce::AudioBuffer<float>& bu
 {
     juce::ignoreUnused(midiMessages);
     
-    if (!enabledParam->get())
+    if (!enabledParam || !enabledParam->get())
         return;
 
-    float threshold = thresholdParam->get();
-    float ratio = ratioParam->get();
-    float qFactor = qFactorParam->get();
-    int numNotches = numNotchesParam->get();
-    float outputGain = outputGainParam->get();
+    float threshold = thresholdParam ? thresholdParam->get() : -20.0f;
+    float ratio = ratioParam ? ratioParam->get() : 4.0f;
+    float qFactor = qFactorParam ? qFactorParam->get() : 1.0f;
+    int numNotches = numNotchesParam ? numNotchesParam->get() : 4;
+    float outputGain = outputGainParam ? outputGainParam->get() : 0.0f;
     float outputGainLinear = juce::Decibels::decibelsToGain(outputGain);
 
     // Análisis de feedback
