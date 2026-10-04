@@ -35,6 +35,9 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
+    // AudioProcessorValueTreeState
+    juce::AudioProcessorValueTreeState apvts;
+
     // Parámetros
     juce::AudioParameterBool* enabledParam;
     juce::AudioParameterFloat* thresholdParam;    // dB
@@ -44,6 +47,8 @@ public:
     juce::AudioParameterFloat* outputGainParam;   // ganancia de salida
 
 private:
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    
     double sampleRate = 44100.0;
     FeedbackAnalyzer analyzer;
     PeakTracker peakTracker;
