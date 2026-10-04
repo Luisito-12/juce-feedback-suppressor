@@ -1,0 +1,42 @@
+# Build directories
+build/
+cmake-build-*/
+*.o
+*.a
+*.lib
+*.dylib
+*.so
+*.dll
+*.exe
+*.vst3
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.user
+*.xcodeproj
+*.xcworkspace
+
+# Dependencies
+JUCE/
+juce/
+/Builds
+
+# CMake
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+
+# macOS
+.AppleDouble
+.LSOverride
+*.app
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
