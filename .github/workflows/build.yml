@@ -1,0 +1,50 @@
+name: Build VST3 Plugin (Windows)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install CMake
+      run: choco install cmake -y
+
+    - name: Cache CMake build files
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: windows-cmake-${{ hashFiles('CMakeLists.txt') }}
+
+    - name: Create build directory
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --config Release --parallel 4
+
+    - name: Find plugin
+      id: find_plugin
+      shell: powershell
+      run: |
+        $plugin = Get-ChildItem -Path "build" -Filter "*.vst3" -Recurse -Directory | Select-Object -First 1
+        if ($plugin) {
+          echo "plugin_path=$($plugin.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        } else {
+          echo "plugin_path=NOT_FOUND" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        }
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: FeedbackSuppressor-Windows-x64
+        path: ${{ steps.find_plugin.outputs.plugin_path }}
+        if-no-files-found: warn
